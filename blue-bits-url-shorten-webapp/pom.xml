@@ -1,0 +1,82 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>blue-bits-parent</artifactId>
+    <groupId>org.bluebits</groupId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <groupId>org.bluebits</groupId>
+  <artifactId>blue-bits-url-shorten-webapp</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <name>Blue Bits: URL Shortener Webapp</name>
+  <description>Blue Bits: URL Shorten Webapp</description>
+  <packaging>war</packaging>
+  <url>http://www.bluebits.org</url>
+
+  <dependencies>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-server</artifactId>
+      <version>1.19</version>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-core</artifactId>
+      <version>1.19</version>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-servlet</artifactId>
+      <version>1.19</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>mongo-java-driver</artifactId>
+      <version>3.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mongodb.morphia</groupId>
+      <artifactId>morphia</artifactId>
+      <version>0.109</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.jcs</groupId>
+      <artifactId>jcs</artifactId>
+      <version>1.3</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>urlshorten</finalName>
+
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+      <resource>
+        <directory>src/main/webapp/WEB-INF/classes</directory>
+      </resource>
+    </resources>
+
+    <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <packagingExcludes>WEB-INF/lib/bctsp-jdk14-1.38.jar</packagingExcludes>
+          <packagingExcludes>WEB-INF/lib/itext-2.1.7.jar</packagingExcludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
