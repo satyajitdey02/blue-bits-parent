@@ -7,11 +7,12 @@ import com.yammer.dropwizard.assets.AssetsBundle;
 import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
 import com.yammer.dropwizard.views.ViewBundle;
-import net.vz.mongodb.jackson.JacksonDBCollection;
+
 import org.bluebits.representations.Url;
 import org.bluebits.resources.UrlShortenResources;
 import org.bluebits.views.MongoHealthCheck;
 import org.bluebits.views.MongoManaged;
+import org.mongojack.JacksonDBCollection;
 
 /**
  * Created by satyajit on 6/25/15.

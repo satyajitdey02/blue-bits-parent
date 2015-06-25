@@ -1,11 +1,11 @@
 package org.bluebits.resources;
 
 import com.sun.jersey.api.core.HttpContext;
-import net.vz.mongodb.jackson.DBQuery;
-import net.vz.mongodb.jackson.JacksonDBCollection;
+
 import org.apache.commons.lang.StringUtils;
 import org.bluebits.exceptions.UrlShortenException;
 import org.bluebits.representations.Url;
+import org.mongojack.JacksonDBCollection;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -29,8 +29,13 @@ public class UrlShortenResources {
   @POST
   @Path("/shorten")
   @Produces({"application/json"})
-  public Response shortenUrl(@Valid Url url, @Context HttpContext context) throws UrlShortenException {
+  public Response shortenUrl(String body, @Context HttpContext context) throws UrlShortenException {
+    if (StringUtils.isBlank(body)) {
+      throw new UrlShortenException("Long Url couldn't be empty/null");
+    }
+
     try {
+      Url url = new Url(body);
       collection.insert(url);
       return Response.ok(url.toString()).build();
     } catch (Exception e) {
@@ -46,12 +51,13 @@ public class UrlShortenResources {
       throw new UrlShortenException(String.format("Invalid short URL with id: %s", base62Code));
     }
 
-    try {
+    return Response.ok("base62Code: " + base62Code).build();
+    /*try {
       Url url = collection.findOne(DBQuery.is("base62Code", base62Code));
       return Response.seeOther(UriBuilder.fromUri(url.getUrl()).build()).build();
     } catch (Exception e) {
       throw new UrlShortenException(e);
-    }
+    }*/
   }
 }
 
