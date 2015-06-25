@@ -27,6 +27,7 @@
   </developers>
 
   <modules>
+    <module>blue-bits-snowflakes</module>
     <module>blue-bits-url-shorten-webapp</module>
     <module>blue-bits-url-shorten-dwapp</module>
   </modules>
