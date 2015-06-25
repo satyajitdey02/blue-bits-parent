@@ -1,13 +1,20 @@
 package org.bluebits.resources;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.sun.jersey.api.core.HttpContext;
-
 import org.apache.commons.lang.StringUtils;
+import org.bluebits.codec.Base62Codec;
 import org.bluebits.exceptions.UrlShortenException;
 import org.bluebits.representations.Url;
+import org.bluebits.snowflakes.BasicEntityIdGenerator;
+import org.bluebits.snowflakes.EntityIdGenerator;
+import org.bluebits.snowflakes.GetHardwareIdFailedException;
+import org.bluebits.snowflakes.InvalidSystemClockException;
+import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
 
-import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -18,7 +25,7 @@ import javax.ws.rs.core.UriBuilder;
  * Created by satyajit on 5/18/15.
  */
 
-@Path("/us")
+@Path("/api/v1/us")
 public class UrlShortenResources {
   private JacksonDBCollection<Url, String> collection;
 
@@ -35,12 +42,38 @@ public class UrlShortenResources {
     }
 
     try {
-      Url url = new Url(body);
+      ObjectMapper mapper = new ObjectMapper();
+      JsonNode jsonNode = mapper.readTree(body);
+      String longUrl = jsonNode.findValue("longUrl").asText();
+      Url url = collection.findOne(DBQuery.is("longUrl", longUrl.trim()));
+      if(url != null) {
+        return Response.ok(url.toString()).build();
+      }
+
+      EntityIdGenerator entityIdGenerator = new BasicEntityIdGenerator();
+      Long id = getEntityId(entityIdGenerator);
+
+      String base62Code = Base62Codec.encode(id);
+      url = new Url(id, longUrl, base62Code);
       collection.insert(url);
-      return Response.ok(url.toString()).build();
+
+      ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+      String responseJson = ow.writeValueAsString(url);
+
+      return Response.ok(responseJson).build();
     } catch (Exception e) {
-      throw new UrlShortenException(String.format("Error shortening URL. Cause: %s", e.getMessage()));
+      throw new UrlShortenException(String.format("Error shortening URL. Cause: %s", e.getMessage()), e);
     }
+  }
+
+  private Long getEntityId(EntityIdGenerator entityIdGenerator) throws InvalidSystemClockException, GetHardwareIdFailedException {
+    Long id = entityIdGenerator.generateLongId();
+    Url url = collection.findOne(DBQuery.is("_id", id));
+    if(url != null) {
+      return getEntityId(entityIdGenerator);
+    }
+
+    return id;
   }
 
   @GET
@@ -51,13 +84,12 @@ public class UrlShortenResources {
       throw new UrlShortenException(String.format("Invalid short URL with id: %s", base62Code));
     }
 
-    return Response.ok("base62Code: " + base62Code).build();
-    /*try {
+    try {
       Url url = collection.findOne(DBQuery.is("base62Code", base62Code));
       return Response.seeOther(UriBuilder.fromUri(url.getUrl()).build()).build();
     } catch (Exception e) {
       throw new UrlShortenException(e);
-    }*/
+    }
   }
 }
 

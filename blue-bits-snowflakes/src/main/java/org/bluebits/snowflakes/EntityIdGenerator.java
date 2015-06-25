@@ -1,5 +1,5 @@
 package org.bluebits.snowflakes;
 
 public interface EntityIdGenerator {
-  String generateLongId() throws InvalidSystemClockException, GetHardwareIdFailedException;
+  public long generateLongId() throws InvalidSystemClockException, GetHardwareIdFailedException;
 }

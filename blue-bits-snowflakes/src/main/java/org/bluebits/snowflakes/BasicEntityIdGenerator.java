@@ -34,7 +34,7 @@ public class BasicEntityIdGenerator implements EntityIdGenerator {
   }
 
   @Override
-  public String generateLongId() throws InvalidSystemClockException {
+  public long generateLongId() throws InvalidSystemClockException {
     long timestamp = System.currentTimeMillis();
     if (timestamp < LAST_TIMESTAMPS) {
       throw new InvalidSystemClockException("Clock moved backwards.  Refusing to generate id for " + (
@@ -51,8 +51,7 @@ public class BasicEntityIdGenerator implements EntityIdGenerator {
     LAST_TIMESTAMPS = timestamp;
     Long id = ((timestamp - TWEPOCH) << TIMESTAMPS_LEFT_SHIFT) | (DATA_CENTER_ID << DATA_CENTER_ID_SHIFT) | SEQUENCE;
     /*A quick hack to avoid negative id value*/
-    id = id < 0 ? (-1L * id) : id;
-    return id.toString();
+    return id < 0 ? (-1L * id) : id;
   }
 
   protected long tilNextMillis(long lastTimestamp) {
@@ -98,9 +97,9 @@ public class BasicEntityIdGenerator implements EntityIdGenerator {
   public static void main(String[] args) throws GetHardwareIdFailedException, InvalidSystemClockException {
     BasicEntityIdGenerator generator = new BasicEntityIdGenerator();
     int n = Integer.parseInt(args[0]);
-    Set<String> ids = new HashSet<String>();
+    Set<Long> ids = new HashSet<Long>();
     for (int i = 0; i < n; i++) {
-      String id = generator.generateLongId();
+      long id = generator.generateLongId();
       if (ids.contains(id)) {
         System.out.println("Duplicate id:" + id);
         exit(1);

@@ -13,24 +13,21 @@ import javax.persistence.GenerationType;
  */
 public class Url {
   @Id
-  @JsonProperty
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @NotBlank
   private Long id;
+
   @URL
-  @JsonProperty
   @NotBlank
   private String url;
-  @JsonProperty
+
+  @NotBlank
   private String base62Code;
 
   public Url() {
   }
 
-  public Url(String url) {
-    this.url = url;
-  }
-
-  public Url(String url, String base62Code) {
+  public Url(Long id, String url, String base62Code) {
+    this.id = id;
     this.url = url;
     this.base62Code = base62Code;
   }
